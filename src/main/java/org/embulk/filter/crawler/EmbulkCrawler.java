@@ -91,7 +91,7 @@ public class EmbulkCrawler extends WebCrawler
             BinaryParseData binaryParseData = (BinaryParseData) parseData;
             map.put(outputPrefix + Constants.HTML, binaryParseData.getHtml());
         }
-        logger.info("{}", webURL.getURL());
+        logger.debug("{}", webURL.getURL());
         myCrawlStat.pages.add(map);
     }
 

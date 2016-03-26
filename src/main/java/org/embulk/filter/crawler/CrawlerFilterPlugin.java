@@ -19,6 +19,7 @@ import org.embulk.spi.PageOutput;
 import org.embulk.spi.PageReader;
 import org.embulk.spi.Schema;
 import org.embulk.spi.type.Types;
+import org.slf4j.Logger;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -34,6 +35,8 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 public class CrawlerFilterPlugin
         implements FilterPlugin
 {
+    private static final Logger logger = Exec.getLogger(CrawlerFilterPlugin.class);
+
     public interface PluginTask
             extends Task
     {
@@ -131,21 +134,10 @@ public class CrawlerFilterPlugin
         return new PageOutput() {
             private PageReader reader = new PageReader(inputSchema);
             private PageBuilder builder = new PageBuilder(Exec.getBufferAllocator(), outputSchema, output);
-            private CrawlController controller = getController();
 
             @Override
             public void finish()
             {
-                for (Object object : controller.getCrawlersLocalData()) {
-                    CrawlStat crawlStat = (CrawlStat) object;
-                    for (Map<String, Object> map : crawlStat.getPages()) {
-                        for (Column outputColumn : outputSchema.getColumns()) {
-                            final Object value = map.get(outputColumn.getName());
-                            setValue(value, outputColumn);
-                        }
-                        builder.addRecord();
-                    }
-                }
                 builder.finish();
             }
 
@@ -158,6 +150,7 @@ public class CrawlerFilterPlugin
             @Override
             public void add(Page page)
             {
+                CrawlController controller = getController();
                 reader.setPage(page);
                 while (reader.nextRecord()) {
                     controller.addSeed(reader.getString(keyNameColumn));
@@ -169,6 +162,16 @@ public class CrawlerFilterPlugin
                 }
                 controller.setCustomData(customData);
                 controller.start(EmbulkCrawler.class, task.getNumberOfCrawlers());
+                for (Object object : controller.getCrawlersLocalData()) {
+                    CrawlStat crawlStat = (CrawlStat) object;
+                    for (Map<String, Object> map : crawlStat.getPages()) {
+                        for (Column outputColumn : outputSchema.getColumns()) {
+                            final Object value = map.get(outputColumn.getName());
+                            setValue(value, outputColumn);
+                        }
+                        builder.addRecord();
+                    }
+                }
             }
 
             /**
