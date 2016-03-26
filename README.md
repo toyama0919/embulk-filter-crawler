@@ -16,6 +16,8 @@ Write short description here and build.gradle file.
 - **politeness_delay**: politeness_delay (integer, default: null)
 - **user_agent_string**: user_agent_string (string, default: null)
 - **output_prefix**: output_prefix (string, default: "")
+- **connection_timeout**: connection timeout millisecond (integer, default: 30000)
+- **socket_timeout**: socket timeout millisecond (integer, default: 20000)
 
 ## Example
 

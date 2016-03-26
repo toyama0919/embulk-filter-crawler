@@ -74,6 +74,14 @@ public class CrawlerFilterPlugin
         @Config("should_not_visit_pattern")
         @ConfigDefault("null")
         public Optional<String> getShouldNotVisitPattern();
+
+        @Config("connection_timeout")
+        @ConfigDefault("null")
+        public Optional<Integer> getConnectionTimeout();
+
+        @Config("socket_timeout")
+        @ConfigDefault("null")
+        public Optional<Integer> getSocketTimeout();
     }
 
     @Override
@@ -201,6 +209,12 @@ public class CrawlerFilterPlugin
                 }
                 if (task.getUserAgentString().isPresent()) {
                     config.setUserAgentString(task.getUserAgentString().get());
+                }
+                if (task.getSocketTimeout().isPresent()) {
+                    config.setSocketTimeout(task.getSocketTimeout().get());
+                }
+                if (task.getConnectionTimeout().isPresent()) {
+                    config.setConnectionTimeout(task.getConnectionTimeout().get());
                 }
 
                 PageFetcher pageFetcher = new PageFetcher(config);
