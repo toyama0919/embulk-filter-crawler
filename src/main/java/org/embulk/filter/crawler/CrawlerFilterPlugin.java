@@ -45,7 +45,7 @@ public class CrawlerFilterPlugin
         public Optional<Integer> getMaxDepthOfCrawling();
 
         @Config("number_of_crawlers")
-        @ConfigDefault("1")
+        @ConfigDefault("2")
         public int getNumberOfCrawlers();
 
         @Config("max_pages_to_fetch")
@@ -161,7 +161,7 @@ public class CrawlerFilterPlugin
                     customData.put("should_not_visit_pattern", task.getShouldNotVisitPattern().get());
                 }
                 controller.setCustomData(customData);
-                controller.start(EmbulkCrawler.class, task.getNumberOfCrawlers());
+                controller.start(EmbulkCrawler.class, task.getNumberOfCrawlers() < 2 ? 2 : task.getNumberOfCrawlers());
                 for (Object object : controller.getCrawlersLocalData()) {
                     CrawlStat crawlStat = (CrawlStat) object;
                     for (Map<String, Object> map : crawlStat.getPages()) {
